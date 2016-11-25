@@ -13,7 +13,17 @@
   <ul id="items"></ul>
 
   <script>
-    function xhr(method, url, body, handler) {
+    function xhr(url, bodyOrHandler, handler) {
+      var method, body;
+	  if (typeof(bodyOrHandler) == "function") {
+		 method = "GET";
+		 handler = bodyOrHandler;
+		 body  = null;
+	  } else {
+		 method = "POST";
+		 body = bodyOrHandler;
+	  }
+
       var req = new XMLHttpRequest();
       req.open(method, url);
 	  if (method === "POST") {
@@ -30,7 +40,7 @@
 	
     function handleSubmit() {
       var input = document.getElementById("xml-item");
-	  xhr("POST", "/api/todo", "item=" + input.value, refresh);
+	  xhr("/api/todo", "item=" + input.value, refresh);
     }
 
     function li(text) {
@@ -43,7 +53,7 @@
       var ul = document.getElementById("items");
       ul.innerHTML = "";
 
-	  xhr("GET", "/api/todo", null, function(response) {
+	  xhr("/api/todo", function(response) {
         var items = JSON.parse(response);
         items.forEach(function(item) {
           ul.appendChild(li(item));
