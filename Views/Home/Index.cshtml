@@ -1,0 +1,19 @@
+﻿<h2>Welcome to ASP.NET MVC @ViewData["Version"] on @ViewData["Runtime"]!</h2>
+
+Add todo
+<form method="POST" action="/api/todo">
+	<input name="item">
+	<input type="submit">
+</form>
+
+<input id="xml-item">
+<button onclick="handleSubmit()">Submit</button>
+<script>
+	function handleSubmit() {
+	  var input = document.getElementById("xml-item");
+	  var req = new XMLHttpRequest();
+	  req.open("POST", "/api/todo");
+	  req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	  req.send(input.value);
+	}
+</script>
