@@ -13,18 +13,24 @@
   <ul id="items"></ul>
 
   <script>
-    function handleSubmit() {
-      var input = document.getElementById("xml-item");
+    function xhr(method, url, body, handler) {
       var req = new XMLHttpRequest();
-      req.open("POST", "/api/todo");
-      req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      req.open(method, url);
+	  if (method === "POST") {
+        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	  }
       req.onreadystatechange = function() {
         if (req.readyState != XMLHttpRequest.DONE)
           return;
 
-        refresh();
+        handler(req.response);
       }
-      req.send("item=" + input.value);
+      req.send(body);
+	}
+	
+    function handleSubmit() {
+      var input = document.getElementById("xml-item");
+	  xhr("POST", "/api/todo", "item=" + input.value, refresh);
     }
 
     function li(text) {
@@ -34,22 +40,15 @@
     }
 
     function refresh() {
-      var req = new XMLHttpRequest();
-      req.open("GET", "/api/todo");
-      req.send();
-
       var ul = document.getElementById("items");
       ul.innerHTML = "";
 
-	  req.onreadystatechange = function() {
-        if (req.readyState != XMLHttpRequest.DONE)
-            return;
-
-          var items = JSON.parse(req.response);
-          items.forEach(function(item) {
-            ul.appendChild(li(item));
-          });
-      }
+	  xhr("GET", "/api/todo", null, function(response) {
+        var items = JSON.parse(response);
+        items.forEach(function(item) {
+          ul.appendChild(li(item));
+        });
+      });
     }
   </script>
 </body>
