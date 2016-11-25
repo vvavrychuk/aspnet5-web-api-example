@@ -1,19 +1,55 @@
-﻿<h2>Welcome to ASP.NET MVC @ViewData["Version"] on @ViewData["Runtime"]!</h2>
+﻿<body onload="refresh()">
+  <h2>Welcome to ASP.NET MVC @ViewData["Version"] on @ViewData["Runtime"]!</h2>
 
-Add todo
-<form method="POST" action="/api/todo">
-	<input name="item">
-	<input type="submit">
-</form>
+  Add todo
+  <form method="POST" action="/api/todo">
+  	<input name="item">
+  	<input type="submit">
+  </form>
 
-<input id="xml-item">
-<button onclick="handleSubmit()">Submit</button>
-<script>
-	function handleSubmit() {
-	  var input = document.getElementById("xml-item");
-	  var req = new XMLHttpRequest();
-	  req.open("POST", "/api/todo");
-	  req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	  req.send(input.value);
-	}
-</script>
+  <input id="xml-item">
+  <button onclick="handleSubmit()">Submit</button>
+
+  <ul id="items"></ul>
+
+  <script>
+    function handleSubmit() {
+      var input = document.getElementById("xml-item");
+      var req = new XMLHttpRequest();
+      req.open("POST", "/api/todo");
+      req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      req.onreadystatechange = function() {
+        if (req.readyState != XMLHttpRequest.DONE)
+          return;
+
+        refresh();
+      }
+      req.send("item=" + input.value);
+    }
+
+    function li(text) {
+      var li = document.createElement("li");
+      li.appendChild(document.createTextNode(text));
+      return li;
+    }
+
+    function refresh() {
+      var req = new XMLHttpRequest();
+      req.open("GET", "/api/todo");
+      req.send();
+
+      var ul = document.getElementById("items");
+      ul.innerHTML = "";
+
+	  req.onreadystatechange = function() {
+        if (req.readyState != XMLHttpRequest.DONE)
+            return;
+
+          var items = JSON.parse(req.response);
+          items.forEach(function(item) {
+            ul.appendChild(li(item));
+          });
+      }
+    }
+  </script>
+</body>
